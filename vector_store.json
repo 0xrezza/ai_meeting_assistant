@@ -1,0 +1,218 @@
+[
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 0,
+    "speaker": "آقای رضایی",
+    "start_time": "00:00",
+    "end_time": "00:03",
+    "text": "سلام، این روزها هوش مصنوعی خیلی مورد توجه قرار گرفته.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 1,
+    "speaker": "آقای رضایی",
+    "start_time": "00:03",
+    "end_time": "00:06",
+    "text": "تقریباً هر هفته خبر جدیدی درباره مدل‌های پیشرفته منتشر می‌شود.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 2,
+    "speaker": "آقای کمالی",
+    "start_time": "00:06",
+    "end_time": "00:09",
+    "text": "درسته، مخصوصاً در حوزه مدل‌های زبانی.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 3,
+    "speaker": "آقای کمالی",
+    "start_time": "00:09",
+    "end_time": "00:12",
+    "text": "خیلی از شرکت‌ها دارند از این فناوری استفاده می‌کنند.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 4,
+    "speaker": "آقای رضایی",
+    "start_time": "00:12",
+    "end_time": "00:15",
+    "text": "به نظر تو مهم‌ترین کاربرد فعلی هوش مصنوعی چیه؟",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 5,
+    "speaker": "آقای کمالی",
+    "start_time": "00:15",
+    "end_time": "00:18",
+    "text": "فکر می‌کنم اتوماسیون وظایف تکراری.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 6,
+    "speaker": "آقای کمالی",
+    "start_time": "00:18",
+    "end_time": "00:22",
+    "text": "مثلاً پردازش اسناد یا پاسخگویی اولیه به مشتریان.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 7,
+    "speaker": "آقای رضایی",
+    "start_time": "00:22",
+    "end_time": "00:25",
+    "text": "من هم موافقم.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 8,
+    "speaker": "آقای رضایی",
+    "start_time": "00:25",
+    "end_time": "00:28",
+    "text": "البته تولید محتوا هم خیلی رشد کرده.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 9,
+    "speaker": "آقای کمالی",
+    "start_time": "00:28",
+    "end_time": "00:31",
+    "text": "بله، تولید متن، تصویر و حتی ویدئو.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 10,
+    "speaker": "آقای کمالی",
+    "start_time": "00:31",
+    "end_time": "00:35",
+    "text": "الان ابزارهای زیادی در این زمینه وجود دارند.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 11,
+    "speaker": "آقای رضایی",
+    "start_time": "00:35",
+    "end_time": "00:38",
+    "text": "بعضی‌ها نگران جایگزین شدن انسان‌ها هستند.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 12,
+    "speaker": "آقای کمالی",
+    "start_time": "00:38",
+    "end_time": "00:41",
+    "text": "این نگرانی را زیاد می‌شنوم.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 13,
+    "speaker": "آقای کمالی",
+    "start_time": "00:41",
+    "end_time": "00:45",
+    "text": "اما معمولاً فناوری بیشتر باعث تغییر نوع مشاغل می‌شود.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 14,
+    "speaker": "آقای رضایی",
+    "start_time": "00:45",
+    "end_time": "00:48",
+    "text": "یعنی به جای حذف کامل، نقش‌ها را تغییر می‌دهد؟",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 15,
+    "speaker": "آقای کمالی",
+    "start_time": "00:48",
+    "end_time": "00:51",
+    "text": "دقیقاً همین‌طور است.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 16,
+    "speaker": "آقای کمالی",
+    "start_time": "00:51",
+    "end_time": "00:54",
+    "text": "مهارت‌های جدید اهمیت بیشتری پیدا می‌کنند.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 17,
+    "speaker": "آقای رضایی",
+    "start_time": "00:54",
+    "end_time": "00:58",
+    "text": "مثلاً کار با ابزارهای هوش مصنوعی.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 18,
+    "speaker": "آقای کمالی",
+    "start_time": "00:58",
+    "end_time": "01:01",
+    "text": "بله، و همچنین ارزیابی خروجی آن‌ها.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 19,
+    "speaker": "آقای رضایی",
+    "start_time": "01:01",
+    "end_time": "01:04",
+    "text": "به نظرت پنج سال دیگر وضعیت چطور خواهد بود؟",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 20,
+    "speaker": "آقای کمالی",
+    "start_time": "01:04",
+    "end_time": "01:08",
+    "text": "احتمالاً هوش مصنوعی در اکثر نرم‌افزارها به صورت پیش‌فرض وجود خواهد داشت.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 21,
+    "speaker": "آقای کمالی",
+    "start_time": "01:08",
+    "end_time": "01:12",
+    "text": "و کاربران بدون اینکه متوجه شوند از آن استفاده خواهند کرد.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 22,
+    "speaker": "آقای رضایی",
+    "start_time": "01:12",
+    "end_time": "01:15",
+    "text": "جالب است، به نظر می‌رسد آینده هیجان‌انگیزی در پیش داریم.",
+    "embedding": []
+  },
+  {
+    "meeting_id": "test_meeting_001",
+    "segment_index": 23,
+    "speaker": "آقای کمالی",
+    "start_time": "01:15",
+    "end_time": "01:17",
+    "text": "کاملاً موافقم.",
+    "embedding": []
+  }
+]

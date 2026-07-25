@@ -1,0 +1,8 @@
+openai-whisper
+jiwer
+hazm
+python-docx
+git+https://github.com/openai/whisper.git
+ollama
+chromadb
+sentence-transformers
