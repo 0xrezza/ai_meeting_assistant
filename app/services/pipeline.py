@@ -185,3 +185,12 @@ class MeetingPipeline:
         print(f"[Pipeline] RAG Chat: {question[:50]}...")
         result = self.rag_service.answer_question(question)
         return result
+
+    def complete_chat(self, system_prompt: str, user_prompt: str) -> dict:
+        """
+        Grounded chat completion with system/user prompts.
+        """
+        print(f"[Pipeline] Grounded Chat complete request...")
+        result = self.rag_service.complete_chat(system_prompt, user_prompt)
+        return result
+

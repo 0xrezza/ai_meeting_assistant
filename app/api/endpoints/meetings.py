@@ -7,6 +7,8 @@ from app.models.schema import (
     ChatRequest,
     ChatResponse,
     HealthResponse,
+    LocalChatCompleteRequest,
+    LocalChatCompleteResponse,
 )
 
 import json
@@ -157,3 +159,23 @@ async def health_check():
         whisper_model=whisper_status,
         ollama_status=ollama_status,
     )
+
+
+@router.post(
+    "/chat/complete",
+    response_model=LocalChatCompleteResponse,
+    summary="چت اختصاصی برای مونو‌ریپوی رضا",
+    description="دریافت پرامپت سیستم و کاربر و تولید پاسخ هوش مصنوعی به فرمت ساختاریافته JSON",
+)
+async def chat_complete(request: LocalChatCompleteRequest):
+    pipeline = _get_pipeline()
+    try:
+        result = pipeline.complete_chat(request.system_prompt, request.user_prompt)
+        return LocalChatCompleteResponse(
+            answer=result["answer"],
+            refused=result["refused"],
+            usedSourceLabels=result.get("usedSourceLabels", []),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

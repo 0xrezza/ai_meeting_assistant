@@ -81,3 +81,59 @@ class RAGChatService:
             "answer": answer,
             "citations": citations
         }
+
+    def complete_chat(self, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
+        """
+        Direct chat completion with structured JSON output from Ollama.
+        """
+        # Optimize and enrich system prompt for premium Persian output style
+        enhanced_system = (
+            f"{system_prompt}\n\n"
+            "دستورالعمل‌های سبک پاسخ‌دهی (Persian Response Style Guidelines):\n"
+            "۱. پاسخ شما در فیلد 'answer' باید بسیار روان، شیوا، حرفه‌ای و محترمانه به زبان فارسی باشد.\n"
+            "۲. اطلاعات را به صورت ساختاریافته، منظم و در صورت نیاز با استفاده از لیست‌های نشانه‌دار (بولت‌پوینت) ارائه کنید.\n"
+            "۳. لحن پاسخ‌دهی باید مانند یک مشاور ارشد دلسوز، دقیق، با اعتماد به نفس و راهگشا باشد.\n"
+            "۴. از بکار بردن کلمات انگلیسی غیرضروری خودداری کنید و معادل‌های مناسب فارسی را استفاده کنید.\n"
+            "۵. در پاسخ دادن زیاده‌گویی نکنید؛ بسیار خلاصه، مفید و کاملاً متمرکز بر سوال کاربر پاسخ دهید."
+        )
+
+        url = f"{self.ollama_url}/api/chat"
+        payload = {
+            "model": self.model_name,
+            "messages": [
+                {"role": "system", "content": enhanced_system},
+                {"role": "user", "content": user_prompt}
+            ],
+            "format": "json",
+            "stream": False
+        }
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={"Content-Type": "application/json"}
+        )
+        try:
+            with urllib.request.urlopen(req) as response:
+                res_data = json.loads(response.read().decode("utf-8"))
+                content = res_data["message"]["content"]
+                # Parse the inner JSON returned by Qwen
+                parsed_json = json.loads(content)
+                return {
+                    "answer": parsed_json.get("answer", ""),
+                    "refused": parsed_json.get("refused", False),
+                    "usedSourceLabels": parsed_json.get("usedSourceLabels", [])
+                }
+        except json.JSONDecodeError as e:
+            # Fallback if Qwen returns a JSON that doesn't parse correctly
+            print(f"[RAGChatService] JSON parsing error from Ollama response: {e}")
+            return {
+                "answer": content if 'content' in locals() else "خطا در تفسیر پاسخ مدل هوش مصنوعی.",
+                "refused": False,
+                "usedSourceLabels": []
+            }
+        except urllib.error.URLError as e:
+            raise RuntimeError(f"Ollama connection error: {e.reason}")
+        except Exception as e:
+            raise RuntimeError(f"Error calling Ollama: {str(e)}")
+

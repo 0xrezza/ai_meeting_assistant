@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
     print("=" * 60)
 
     # Load heavy models
-    pipeline.load_models()
+    # pipeline.load_models()
 
     # Inject pipeline into the endpoints
     set_pipeline(pipeline)

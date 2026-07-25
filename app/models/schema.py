@@ -62,3 +62,17 @@ class HealthResponse(BaseModel):
     whisper_model: str = ""
     ollama_status: str = ""
 
+
+class LocalChatCompleteRequest(BaseModel):
+    """درخواست چت اختصاصی برای مونو‌ریپوی رضا"""
+    system_prompt: str = Field(..., description="The system prompt containing context and instructions")
+    user_prompt: str = Field(..., description="The user query and session conversation history")
+
+
+class LocalChatCompleteResponse(BaseModel):
+    """پاسخ چت اختصاصی که با فرمت JSON به مونو‌ریپو فرستاده می‌شود"""
+    answer: str = Field(..., description="AI generated answer")
+    refused: bool = Field(..., description="Whether the AI refused to answer")
+    usedSourceLabels: List[str] = Field(default_factory=list, description="Labels of sources actually used")
+
+
