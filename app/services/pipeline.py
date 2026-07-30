@@ -50,7 +50,7 @@ class MeetingPipeline:
 
     def load_models(self):
         """Load heavy models at startup (Whisper)."""
-        self.asr_service.load_whisper_model("large-v3")
+        self.asr_service.load_whisper_model()
 
     def _generate_meeting_id(self) -> str:
         """Generate a unique meeting ID based on timestamp."""

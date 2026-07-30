@@ -17,25 +17,34 @@ class ASRService:
     Based on Armin's main.py but refactored as a clean service class.
     """
 
+    def load_env_variables(self):
+        """Load environment variables from the monorepo .env file."""
+        import os
+        from pathlib import Path
+        paths_to_check = [
+            Path(".") / ".env",
+            Path("..") / ".env",
+            Path("..") / "modira-main" / "modira" / ".env",
+            Path("..") / "modira" / ".env",
+            Path("D:/Aleph company/modira-main/modira/.env"),
+        ]
+        for p in paths_to_check:
+            if p.exists():
+                print(f"[ASR] Loading environment variables from: {p.resolve()}")
+                with open(p, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            k, v = line.split("=", 1)
+                            v = v.strip().strip("'").strip('"')
+                            os.environ[k.strip()] = v
+                break
+
     def __init__(self, ollama_url: str = "http://127.0.0.1:11434"):
         self.ollama_url = ollama_url
-        self.correction_model = "qwen2.5:7b"
         self.normalizer = PersianNormalizer()
-        self.whisper_model = None  # Lazy loaded
-
-    def load_whisper_model(self, model_size: str = "large-v3"):
-        """
-        Load the Whisper model. Call this once at application startup.
-        """
-        import whisper
-        print(f"[ASR] Loading Whisper model '{model_size}'... (this may take a moment)")
-        self.whisper_model = whisper.load_model(model_size)
-        print(f"[ASR] Whisper model '{model_size}' loaded successfully.")
-
-    def _ensure_model_loaded(self):
-        """Ensure Whisper model is loaded before use."""
-        if self.whisper_model is None:
-            self.load_whisper_model()
+        # Always run env load during initialization
+        self.load_env_variables()
 
     def _format_timestamp(self, seconds: float) -> str:
         """Convert seconds to MM:SS.mmm format."""
@@ -45,44 +54,30 @@ class ASRService:
 
     def _correct_text_with_llm(self, text: str) -> str:
         """
-        Correct transcription errors using DeepSeek-R1 via Ollama.
-        Based on Armin's correct_text_with_gpt() function.
+        Correct transcription errors using OpenAI GPT-4o-mini API.
+        This runs completely serverless/API-based with zero local CPU load.
         """
-        url = f"{self.ollama_url}/api/chat"
+        import os
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            print("[ASR] Warning: OPENAI_API_KEY not found. Skipping text correction.")
+            return text
+
+        url = "https://api.openai.com/v1/chat/completions"
         payload = {
-            "model": self.correction_model,
+            "model": "gpt-4o-mini",
             "messages": [
                 {
                     "role": "system",
                     "content": (
-                        "You are an Automatic Speech Recognition (ASR) post-processing model.\n\n"
-                        "The input transcript is in Persian (Farsi).\n"
-                        "The output MUST also be in Persian (Farsi). Never translate the transcript into another language.\n\n"
-                        "Your job is to minimally correct ASR transcripts while preserving the speaker's intended meaning.\n\n"
-                        "Your primary objective is semantic preservation, NOT producing well-written Persian.\n\n"
-                        "Allowed corrections (only when highly confident):\n\n"
-                        "1. Correct obvious spelling mistakes.\n"
-                        "2. Correct Persian half-spacing (e.g. میخواهم, کتابها).\n"
-                        "3. Correct punctuation.\n"
-                        "4. Normalize numbers, dates, and units into a consistent format.\n"
-                        "5. Correct obvious ASR recognition mistakes only when the intended word is nearly certain.\n"
-                        "6. Normalize domain-specific terminology using the provided glossary.\n\n"
-                        "Forbidden operations:\n\n"
-                        "- Do NOT paraphrase.\n"
-                        "- Do NOT rewrite sentences.\n"
-                        "- Do NOT summarize.\n"
-                        "- Do NOT reorder words.\n"
-                        "- Do NOT improve grammar.\n"
-                        "- Do NOT replace words with synonyms.\n"
-                        "- Do NOT remove repetitions or hesitations.\n"
-                        "- Do NOT add missing words.\n"
-                        "- Do NOT remove words.\n"
-                        "- Do NOT infer information that is not explicitly present.\n"
-                        "- Do NOT make corrections based on what \"sounds better.\"\n"
-                        "- Do NOT translate any part of the transcript into another language.\n\n"
-                        "If multiple interpretations are possible, keep the original transcript unchanged.\n\n"
-                        "If your confidence is below 95%, do not modify that part of the transcript.\n\n"
-                        "Return ONLY the corrected Persian transcript. Do not include explanations, comments, notes, confidence scores, or any additional text."
+                        "You are an expert Automatic Speech Recognition (ASR) post-processor specializing in Persian (Farsi) language.\n"
+                        "Your goal is to clean up and minimally correct ASR transcription errors to make the transcript readable, clean, and grammatically standard, without changing the meaning or speaker style.\n\n"
+                        "Core Principles:\n"
+                        "1. SEMANTIC PRESERVATION: Keep the original words and order. Do NOT summarize, paraphrase, rewrite, or replace words with synonyms.\n"
+                        "2. ORTHOGRAPHY & HALF-SPACING: Correct half-spacing (نیم‌فاصله) using the Zero-Width Non-Joiner (ZWNJ). For example, prefixes like 'می‌' (e.g., می‌خواهم) and suffixes like 'ها' (e.g., کتاب‌ها)، 'تر' (e.g., بزرگ‌تر)، and 'ام/ات/اش' should be correctly half-spaced.\n"
+                        "3. SPELLING CORRECTION: Fix obvious typos or phonetic transcription mistakes (e.g., 'سحبت' to 'صحبت').\n"
+                        "4. NUMERALS & DATES: Format numbers, dates, monetary units, and times cleanly (e.g., 'پنج میلیون' to '۵,۰۰۰,۰۰۰').\n"
+                        "5. NO ADDED COMMENTS: Return ONLY the corrected Farsi text. Do NOT output markdown code blocks (like ```farsi or ```text), notes, explanations, or preambles."
                     )
                 },
                 {
@@ -90,30 +85,23 @@ class ASRService:
                     "content": f"Correct this text: {text}"
                 }
             ],
-            "stream": False,
-            "options": {
-                "temperature": 0.1
-            }
+            "temperature": 0.1
         }
 
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             url, data=data,
-            headers={"Content-Type": "application/json"}
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            }
         )
         try:
             with urllib.request.urlopen(req) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
-                return res_data["message"]["content"].strip()
-        except urllib.error.HTTPError as e:
-            try:
-                body = e.read().decode("utf-8")
-                print(f"[ASR] Ollama HTTP Error {e.code}: {body}")
-            except Exception:
-                print(f"[ASR] Ollama HTTP Error {e.code}")
-            return text
+                return res_data["choices"][0]["message"]["content"].strip()
         except Exception as e:
-            print(f"[ASR] Warning: Text correction failed, using original text. Error: {str(e)[:100]}")
+            print(f"[ASR] Warning: GPT-4o-mini text correction failed. Error: {e}")
             return text
     def _upload_file_soniox(self, file_path: Path, api_key: str) -> str:
         import uuid
@@ -301,109 +289,23 @@ class ASRService:
     def transcribe_audio(self, audio_path: str, meeting_id: str) -> Transcript:
         """
         Full ASR pipeline:
-        1. Try Soniox Cloud API (if API Key available)
-        2. Fallback to local Whisper transcription if Soniox fails
-        3. DeepSeek text correction (applied inside segment loops)
-        4. Persian normalization
-        5. Return structured Transcript object
+        1. Load environment variables dynamically to capture updated credentials.
+        2. Transcribe exclusively with Soniox Cloud API (no local Whisper fallback).
         """
         import os
         audio_file = Path(audio_path)
         if not audio_file.exists():
             raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
+        # Always reload environment variables to check for charged API keys
+        self.load_env_variables()
+
         # Check for Soniox API key
         soniox_api_key = os.environ.get("SONIOX_API_KEY")
         if not soniox_api_key:
-            # Fallback to the provided key
+            # Fallback to the provided default key if not set in environment
             soniox_api_key = "d43a2f6b67d1e9fab178791cf4381ebb8bcbe0e24b72da5dc7d2446bcc26eb2e"
 
-        if soniox_api_key:
-            try:
-                print(f"[ASR] Attempting Soniox Cloud API transcription for: {audio_file.name}")
-                return self._transcribe_audio_soniox(audio_path, meeting_id, soniox_api_key)
-            except Exception as e:
-                print(f"[ASR] Warning: Soniox transcription failed. Falling back to local Whisper. Error: {e}")
-
-        # --- Whisper Fallback ---
-        self._ensure_model_loaded()
-
-        print(f"[ASR] Transcribing locally with Whisper: {audio_file.name}")
-
-        result = self.whisper_model.transcribe(
-            audio_path,
-            language="fa",
-            fp16=False,
-            verbose=False,
-        )
-
-        full_text = result["text"].strip()
-        if not full_text:
-            raise ValueError("No text could be extracted from the audio file.")
-
-        print(f"[ASR] Raw local transcription complete. {len(result['segments'])} segments found.")
-
-        segments: List[TranscriptSegment] = []
-        hallucination_substrings = ["موسیقی", "music", "subtitles", "subtitle", "سپاس", "ممنون", "تشکر"]
-        
-        for i, seg in enumerate(result["segments"]):
-            raw_text = seg["text"].strip()
-            if not raw_text:
-                continue
-                
-            if seg.get("no_speech_prob", 0.0) > 0.45:
-                print(f"[ASR] Skipping silent segment {i+1} (no_speech_prob={seg['no_speech_prob']:.2f} > 0.45)")
-                continue
-                
-            check_text = raw_text.lower().strip()
-            is_hallucination = False
-            for word in hallucination_substrings:
-                if word in check_text:
-                    is_hallucination = True
-                    break
-                    
-            if is_hallucination or not any(c.isalnum() for c in check_text):
-                print(f"[ASR] Skipping hallucination segment {i+1}: '{raw_text}'")
-                continue
-
-            corrected_text = self._correct_text_with_llm(raw_text)
-            
-            check_corrected = corrected_text.lower().strip()
-            is_corrected_hallucination = False
-            for word in hallucination_substrings:
-                if word in check_corrected:
-                    is_corrected_hallucination = True
-                    break
-                    
-            if is_corrected_hallucination:
-                continue
-
-            normalized_text = self.normalizer.normalize_text(corrected_text)
-
-            segment = TranscriptSegment(
-                speaker=f"Speaker",
-                start_time=self._format_timestamp(seg["start"]),
-                end_time=self._format_timestamp(seg["end"]),
-                text=normalized_text,
-            )
-            segments.append(segment)
-
-            if (i + 1) % 10 == 0:
-                print(f"[ASR] Processed {i + 1}/{len(result['segments'])} segments...")
-
-        if not segments:
-            print("[ASR] No valid speech segments found. Adding default notice.")
-            segments.append(TranscriptSegment(
-                speaker="System",
-                start_time="00:00:00",
-                end_time="00:00:05",
-                text="گفتاری در این فایل صوتی تشخیص داده نشد. لطفا مطمئن شوید میکروفون یا صدای سیستم هنگام ضبط فعال بوده است."
-            ))
-
-        print(f"[ASR] Local transcription complete. {len(segments)} segments processed.")
-
-        return Transcript(
-            meeting_id=meeting_id,
-            segments=segments,
-        )
+        print(f"[ASR] Attempting Soniox Cloud API transcription for: {audio_file.name}")
+        return self._transcribe_audio_soniox(audio_path, meeting_id, soniox_api_key)
 
