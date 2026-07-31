@@ -4,7 +4,7 @@ AI Meeting Assistant - FastAPI Application
 نقطه ورود اصلی سرویس هوش مصنوعی دستیار جلسات.
 
 اجرا:
-    uvicorn app_main:app --host 0.0.0.0 --port 8000 --reload
+    uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 مستندات API:
     http://localhost:8000/docs
