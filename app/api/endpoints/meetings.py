@@ -17,12 +17,12 @@ import urllib.error
 
 router = APIRouter(prefix="/api/v1", tags=["meetings"])
 
-# Pipeline instance will be set by app_main.py at startup
+# Pipeline instance will be set by main.py at startup
 _pipeline = None
 
 
 def set_pipeline(pipeline):
-    """Called by app_main.py to inject the pipeline instance."""
+    """Called by main.py to inject the pipeline instance."""
     global _pipeline
     _pipeline = pipeline
 
