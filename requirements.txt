@@ -3,20 +3,3 @@ fastapi
 uvicorn[standard]
 python-multipart
 pydantic
-
-# === ASR (Armin's Whisper) ===
-openai-whisper
-# git+https://github.com/openai/whisper.git  # Alternative install method
-
-# === LLM Integration ===
-ollama
-
-# === Text Processing ===
-python-docx
-jiwer
-
-# === (NOT USED - replaced with custom implementations) ===
-# hazm          → replaced by app/nlp/normalizer.py (PersianNormalizer)
-# chromadb      → replaced by app/services/vector_db.py (SimpleVectorDB)
-# langchain     → not needed
-# openai        → not needed (using local Ollama)
