@@ -304,7 +304,7 @@ class ASRService:
         soniox_api_key = os.environ.get("SONIOX_API_KEY")
         if not soniox_api_key:
             # Fallback to the provided default key if not set in environment
-            soniox_api_key = "d43a2f6b67d1e9fab178791cf4381ebb8bcbe0e24b72da5dc7d2446bcc26eb2e"
+            soniox_api_key = "f008b077b9718e53c59faddc270d58aad399ff02cd8ed0f812dec1853eb0831d"
 
         print(f"[ASR] Attempting Soniox Cloud API transcription for: {audio_file.name}")
         return self._transcribe_audio_soniox(audio_path, meeting_id, soniox_api_key)
